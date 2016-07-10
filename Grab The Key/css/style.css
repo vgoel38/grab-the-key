@@ -1,0 +1,46 @@
+::-webkit-scrollbar {
+    display: none;
+}
+
+canvas{
+    margin:10px;
+}
+
+.header{
+    font-family: 'Pacifico', cursive;
+    font-size:40px;
+    text-align: center;
+    margin:5px;
+}
+
+.score,
+.lives{
+    font-size:20px;
+    text-align: center;
+    margin:5px;
+}
+
+.characters,
+.instructions,
+.points{
+    font-family: 'Bangers', cursive;
+    margin:20px;
+}
+
+.instructions{
+    margin-top:40px;
+    margin-bottom:50px;
+}
+
+.instructions-text{
+    font-family: 'Pacifico', cursive;
+    font-size:20px;
+}
+
+.characters img{
+    cursor: pointer;
+}
+
+#container {
+    text-align: center;
+}
