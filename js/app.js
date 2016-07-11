@@ -1,13 +1,12 @@
 var score = 0,
-    lives = 1,
-    minEnemySpeed=100,
-    maxEnemySpeed=700,
-    playerOriginX=0,
-    playerOriginY=2,
-    totalRows=6,
-    totalCols=11;
+    MIN_ENEMY_SPEED = 100,
+    MAX_ENEMY_SPEED = 700,
+    PLAYER_ORIGIN_X = 0,
+    PLAYER_ORIGIN_Y = 2,
+    TOTAL_ROWS = 6,
+    TOTAL_COLS = 11;
 
-var backgroundColor="#F67931";
+var BACKGROUND_COLOUR = "#F67931";
 
 var playerImageURL = 'images/char-boy.png';
 
@@ -19,12 +18,14 @@ var characters = [
     'images/char-princess-girl.png'
 ];
 
+//runs when the DOM has been created
 $(function(){
-    $('body').css('background-color',backgroundColor);
+    //sets background colour of the body
+    $('body').css('background-color',BACKGROUND_COLOUR);
 
     //inserting all the character images
     characters.forEach(function(character){
-        var characterHTML = '<span><img src="'+character+'"></span>';
+        var characterHTML = '<span><img src="' + character + '"></span>';
         $('.characters').append(characterHTML);
         $('.characters span').last().click(function(){
             playerImageURL = character;
@@ -61,25 +62,19 @@ var filledPositions = [];
 function randomVacantPosition (x,y){
     var x,y;
     while(true){
-        x=randomNumberBetween(1,10);
-        y=randomNumberBetween(0,5);
+        x = randomNumberBetween(1,10);
+        y = randomNumberBetween(0,5);
         var i;
-        for(i=0;i<filledPositions.length;i++){
-            if(x===filledPositions[i].x && y===filledPositions[i].y){
+        for(i = 0; i < filledPositions.length; i++){
+            if(x === filledPositions[i].x && y === filledPositions[i].y){
                 break;
             }
         }
-        if(i===filledPositions.length){
+        if(i === filledPositions.length){
             return {x,y};
         }
     }
 };
-
-//updates number of lives left
-function updateLives(newLives){
-    lives = newLives;
-    $('lives').html("Lives : "+lives);
-}
 
 /*****ENEMY CLASS*******/
 
@@ -88,8 +83,8 @@ var Enemy = function() {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
-    this.y=-100-Math.random()*1000;//so that enemies begin from varied distances from the top of the canvas
-    this.x=randomNumberBetween(1,10)*horizontalDistance+playerHorizontalDisDelta;//random column for an enemy
+    this.y = -100 - Math.random() * 1000;//so that enemies begin from varied distances from the top of the canvas
+    this.x = randomNumberBetween(1,10) * horizontalDistance + playerHorizontalDisDelta;//random column for an enemy
 };
 
 // Parameter: dt, a time delta between ticks
@@ -97,22 +92,22 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-    this.y=this.y+dt*(minEnemySpeed+Math.random()*(maxEnemySpeed - minEnemySpeed));
+    this.y = this.y + dt * (MIN_ENEMY_SPEED + (Math.random() * (MAX_ENEMY_SPEED - MIN_ENEMY_SPEED)));
     if(this.y > canvas.width){
-        this.x=randomNumberBetween(1,10)*horizontalDistance+playerHorizontalDisDelta;
-        this.y=-100-Math.random()*1000;
+        this.x = randomNumberBetween(1,10) * horizontalDistance + playerHorizontalDisDelta;
+        this.y = -100 - Math.random() * 1000;
     }
 
     //calculating the row and col of an enemy from its x and y position on the canvas
-    var row=Math.floor((this.y - playerVerticalDisDelta)/verticalDistance);
-    var col=Math.floor((this.x - playerHorizontalDisDelta)/horizontalDistance);
+    var row = Math.floor((this.y - playerVerticalDisDelta) / verticalDistance);
+    var col = Math.floor((this.x - playerHorizontalDisDelta) / horizontalDistance);
     //detecting collison of enemies and the player
     if(col === player.x && row === player.y){
-        updateLives(lives-1);//updating lives left
-        if(lives>0){
+        player.updateLives(-1);//updating lives left
+        if(player.livesLeft() > 0){
             //secnding player back to the original position
-            player.x=playerOriginX;
-            player.y=playerOriginY;
+            player.x = PLAYER_ORIGIN_X;
+            player.y = PLAYER_ORIGIN_Y;
         }
         else {
             alert("Game Over!");
@@ -131,35 +126,91 @@ Enemy.prototype.render = function() {
 /*****PLAYER CLASS*******/
 
 var Player = function(){
-    this.x=playerOriginX;
-    this.y=playerOriginY;
-}
+    this.x = PLAYER_ORIGIN_X;
+    this.y = PLAYER_ORIGIN_Y;
+    this.lives = 1;
+};
 
 Player.prototype.handleInput = function(action){
     //if an arrow key has been pressed and the player is not going out of the boundary of the
     //canvas or is not stepping into a prohibited cell (like a rock), then either teleport
     //or move the player one step
-    if(action==='right' && player.x*horizontalDistance+playerHorizontalDisDelta+100<canvas.width-100 && !isPositionProhibited(player.x+1,player.y)){
-        if(!playerTeleported(player.x+1,player.y))
-            player.x=player.x+1;
+    if(action === 'right' && this.x * horizontalDistance + playerHorizontalDisDelta + 100 < canvas.width - 100 && !player.isPositionProhibited(this.x + 1,this.y,allRocks)){
+        if(!player.teleported(this.x + 1,this.y, teleportPlatform1, teleportPlatform2))
+            this.x = this.x + 1;
     }
-    else if(action==='left' && player.x*horizontalDistance+playerHorizontalDisDelta-100>-100 && !isPositionProhibited(player.x-1,player.y)){
-        if(!playerTeleported(player.x-1,player.y))
-            player.x=player.x-1;
+    else if(action === 'left' && this.x * horizontalDistance + playerHorizontalDisDelta - 100 > -100 && !player.isPositionProhibited(this.x - 1,this.y,allRocks)){
+        if(!player.teleported(this.x - 1,this.y, teleportPlatform1, teleportPlatform2))
+            this.x=this.x - 1;
     }
-    else if(action==='up' && player.y*verticalDistance+playerVerticalDisDelta-100>-100 && !isPositionProhibited(player.x,player.y-1)){
-        if(!playerTeleported(player.x,player.y-1))
-            player.y=player.y-1;
+    else if(action === 'up' && this.y * verticalDistance + playerVerticalDisDelta - 100 > -100 && !player.isPositionProhibited(this.x,this.y - 1,allRocks)){
+        if(!player.teleported(this.x,this.y - 1, teleportPlatform1, teleportPlatform2))
+            this.y = this.y - 1;
     }
-    else if(action==='down' && player.y*verticalDistance+playerVerticalDisDelta+100<canvas.height-100 && !isPositionProhibited(player.x,player.y+1)){
-        if(!playerTeleported(player.x,player.y+1))
-            player.y=player.y+1;
+    else if(action === 'down' && this.y * verticalDistance + playerVerticalDisDelta + 100 < canvas.height - 100 && !player.isPositionProhibited(this.x,this.y + 1,allRocks)){
+        if(!player.teleported(this.x,this.y + 1, teleportPlatform1, teleportPlatform2))
+            this.y = this.y + 1;
     }
-}
+};
 
 Player.prototype.render = function(){
-    ctx.drawImage(Resources.get(playerImageURL), this.x*horizontalDistance+playerHorizontalDisDelta, this.y*verticalDistance+playerVerticalDisDelta);
-}
+    ctx.drawImage(Resources.get(playerImageURL), this.x * horizontalDistance + playerHorizontalDisDelta, this.y * verticalDistance + playerVerticalDisDelta);
+};
+
+//updates number of lives left
+Player.prototype.updateLives = function(delta){
+    this.lives = this.lives + delta;
+    $('.lives').html("Lives : " + this.lives);
+};
+
+//returns number of player lives left
+Player.prototype.livesLeft = function(){
+    return this.lives;
+};
+
+//tells whether the player will be teleported or not on his next move(nextX,nextY)
+Player.prototype.teleported =function(nextX,nextY,teleportPlatform1, teleportPlatform2){
+    if(nextX === teleportPlatform1.x && nextY === teleportPlatform1.y){
+        this.x=teleportPlatform2.x;
+        this.y=teleportPlatform2.y;
+        return true;
+    }
+    else if(nextX === teleportPlatform2.x && nextY === teleportPlatform2.y){
+        this.x=teleportPlatform1.x;
+        this.y=teleportPlatform1.y
+        return true;
+    }
+    return false;
+};
+
+//tells whether there is a rock on (x,y) or not
+Player.prototype.isPositionProhibited = function(nextX,nextY,allRocks){
+    for(var i = 0; i < allRocks.length; i++){
+        if(allRocks[i].x === nextX && allRocks[i].y === nextY){
+            return true;
+        }
+    }
+    return false;
+};
+
+//Checking collisions of the player with other element except enemies
+Player.prototype.checkCollisions = function(allGems,heart,key){
+    if(player.x === allGems[0].x && player.y === allGems[0].y) {updateScore(score+10);allGems[0].visible=false;}
+    if(player.x === allGems[1].x && player.y === allGems[1].y) {updateScore(score+10);allGems[1].visible=false;}
+    if(player.x === allGems[2].x && player.y === allGems[2].y) {updateScore(score+20);allGems[2].visible=false;}
+    if(player.x === allGems[3].x && player.y === allGems[3].y) {updateScore(score+20);allGems[3].visible=false;}
+    if(player.x === allGems[4].x && player.y === allGems[4].y) {updateScore(score+30);allGems[4].visible=false;}
+    if(player.x === allGems[5].x && player.y === allGems[5].y) {updateScore(score+30);allGems[5].visible=false;}
+
+    if(player.x === heart.x && player.y === heart.y) {player.updateLives(1); heart.visible=false;}
+
+    if(player.x === key.x && player.y === key.y){
+        key.visible=false;
+        alert("Congrats. You completed the game. Your score is "+score+".");
+        resetGame();
+    }
+
+};
 
 
 /*****GEM CLASS*******/
@@ -172,11 +223,11 @@ var Gem = function(imageURL, x, y){
 
     //add the gem's position to the filledPositions array
     filledPositions.push({x,y});
-}
+};
 
 Gem.prototype.render = function(){
     ctx.drawImage(Resources.get(this.sprite), this.x*horizontalDistance+gemHorizontalDisDelta, this.y*verticalDistance+gemVerticalDisDelta);
-}
+};
 
 /*****TELEPORT PLATFORM CLASS*******/
 
@@ -186,26 +237,11 @@ var TeleportPlatform = function(position){
     this.y=position.y;
 
     filledPositions.push(position);
-}
+};
 
 TeleportPlatform.prototype.render = function(){
     ctx.drawImage(Resources.get(this.sprite), this.x*horizontalDistance+teleportHorizontalDisDelta, this.y*verticalDistance+teleportVerticalDisDelta);
-}
-
-//tells whether the player willbe teleported or not on his next move(x,y)
-function playerTeleported(x,y){
-    if(x===teleportPlatform1.x && y===teleportPlatform1.y){
-        player.x=teleportPlatform2.x;
-        player.y=teleportPlatform2.y
-        return true;
-    }
-    else if(x===teleportPlatform2.x && y===teleportPlatform2.y){
-        player.x=teleportPlatform1.x;
-        player.y=teleportPlatform1.y
-        return true;
-    }
-    return false;
-}
+};
 
 /*****HEART CLASS*******/
 
@@ -216,11 +252,11 @@ var Heart  = function(position){
     this.visible=true;
 
     filledPositions.push(position);
-}
+};
 
 Heart.prototype.render = function(){
     ctx.drawImage(Resources.get(this.sprite), this.x*horizontalDistance+heartHorizontalDisDelta, this.y*verticalDistance+heartVerticalDisDelta);
-}
+};
 
 /*****ROCK CLASS*******/
 
@@ -230,21 +266,11 @@ var Rock = function(position){
     this.y = position.y;
 
     filledPositions.push(position);
-}
+};
 
 Rock.prototype.render = function(){
     ctx.drawImage(Resources.get(this.sprite), this.x*horizontalDistance+rockHorizontalDisDelta, this.y*verticalDistance+rockVerticalDisDelta);
-}
-
-//tells whether there is a rock on (x,y) or not
-function isPositionProhibited(x,y){
-    for(var i=0; i<allRocks.length; i++){
-        if(allRocks[i].x===x && allRocks[i].y===y){
-            return true;
-        }
-    }
-    return false;
-}
+};
 
 /*****KEY CLASS*******/
 
@@ -255,11 +281,11 @@ var Key = function(position){
     this.visible=true;
 
     filledPositions.push(position);
-}
+};
 
 Key.prototype.render = function(){
     ctx.drawImage(Resources.get(this.sprite), this.x*horizontalDistance+keyHorizontalDisDelta, this.y*verticalDistance+keyVerticalDisDelta);
-}
+};
 
 
 //creating instances of all the classes
@@ -306,39 +332,19 @@ document.addEventListener('keyup', function(e) {
         40: 'down'
     };
     player.handleInput(allowedKeys[e.keyCode]);
-    checkCollisions();
+    player.checkCollisions(allGems,heart,key);
 });
-
-//Checking collisions of the player with other element except enemies
-function checkCollisions(){
-    if(player.x === allGems[0].x && player.y === allGems[0].y) {updateScore(score+10);allGems[0].visible=false;}
-    if(player.x === allGems[1].x && player.y === allGems[1].y) {updateScore(score+10);allGems[1].visible=false;}
-    if(player.x === allGems[2].x && player.y === allGems[2].y) {updateScore(score+20);allGems[2].visible=false;}
-    if(player.x === allGems[3].x && player.y === allGems[3].y) {updateScore(score+20);allGems[3].visible=false;}
-    if(player.x === allGems[4].x && player.y === allGems[4].y) {updateScore(score+30);allGems[4].visible=false;}
-    if(player.x === allGems[5].x && player.y === allGems[5].y) {updateScore(score+30);allGems[5].visible=false;}
-
-    if(player.x === heart.x && player.y === heart.y) {updateLives(lives+1); heart.visible=false;}
-
-    if(player.x === key.x && player.y === key.y){
-        key.visible=false;
-        alert("Congrats. You completed the game. Your score is "+score+".");
-        resetGame();
-    }
-
-};
 
 //updating score
 function updateScore(newScore){
     score = newScore;
     $('.score').html("Score : "+score);
-}
+};
 
 //resetting game by refreshing the page
 function resetGame(){
     location.reload();
-}
-
+};
 
 //preventing scrolling of the page on keydowns
 var ar=new Array(33,34,35,36,37,38,39,40);

@@ -110,7 +110,7 @@ var Engine = (function(global) {
          //background colour of canvas
         ctx.beginPath();
         ctx.rect(0, 0, 1250, 550);
-        ctx.fillStyle = backgroundColor;
+        ctx.fillStyle = BACKGROUND_COLOUR;
         ctx.fill();
 
         var colImages = [
