@@ -7,4 +7,3 @@
 <img src="images/GTKsnap1.png">
 <img src="images/GTKsnap2.png">
 <img src="images/GTKsnap3.png">
-<img src="images/GTKsnap4.png">

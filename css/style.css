@@ -22,19 +22,28 @@ canvas{
 
 .characters,
 .instructions,
+.controls,
 .points{
     font-family: 'Bangers', cursive;
     margin:20px;
 }
 
-.instructions{
+.instructions,
+.controls{
     margin-top:40px;
     margin-bottom:50px;
 }
 
-.instructions-text{
+.instructions-text,
+.controls-text{
     font-family: 'Pacifico', cursive;
     font-size:20px;
+}
+
+.controls img{
+    width:80px;
+    height:50px;
+    margin-bottom:10px;
 }
 
 .characters img{
