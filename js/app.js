@@ -135,19 +135,19 @@ Player.prototype.handleInput = function(action){
     //if an arrow key has been pressed and the player is not going out of the boundary of the
     //canvas or is not stepping into a prohibited cell (like a rock), then either teleport
     //or move the player one step
-    if(action === 'right' && this.x * horizontalDistance + playerHorizontalDisDelta + 100 < canvas.width - 100 && !player.isPositionProhibited(this.x + 1,this.y,allRocks)){
+    if(action === 'right' && this.x * horizontalDistance + playerHorizontalDisDelta + 100 < canvas.width - 100 && !this.isPositionProhibited(this.x + 1,this.y,allRocks)){
         if(!this.teleported(this.x + 1,this.y, teleportPlatform1, teleportPlatform2))
             this.x = this.x + 1;
     }
-    else if(action === 'left' && this.x * horizontalDistance + playerHorizontalDisDelta - 100 > -100 && !player.isPositionProhibited(this.x - 1,this.y,allRocks)){
+    else if(action === 'left' && this.x * horizontalDistance + playerHorizontalDisDelta - 100 > -100 && !this.isPositionProhibited(this.x - 1,this.y,allRocks)){
         if(!this.teleported(this.x - 1,this.y, teleportPlatform1, teleportPlatform2))
             this.x=this.x - 1;
     }
-    else if(action === 'up' && this.y * verticalDistance + playerVerticalDisDelta - 100 > -100 && !player.isPositionProhibited(this.x,this.y - 1,allRocks)){
+    else if(action === 'up' && this.y * verticalDistance + playerVerticalDisDelta - 100 > -100 && !this.isPositionProhibited(this.x,this.y - 1,allRocks)){
         if(!this.teleported(this.x,this.y - 1, teleportPlatform1, teleportPlatform2))
             this.y = this.y - 1;
     }
-    else if(action === 'down' && this.y * verticalDistance + playerVerticalDisDelta + 100 < canvas.height - 100 && !player.isPositionProhibited(this.x,this.y + 1,allRocks)){
+    else if(action === 'down' && this.y * verticalDistance + playerVerticalDisDelta + 100 < canvas.height - 100 && !this.isPositionProhibited(this.x,this.y + 1,allRocks)){
         if(!this.teleported(this.x,this.y + 1, teleportPlatform1, teleportPlatform2))
             this.y = this.y + 1;
     }
