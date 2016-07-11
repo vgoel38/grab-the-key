@@ -136,19 +136,19 @@ Player.prototype.handleInput = function(action){
     //canvas or is not stepping into a prohibited cell (like a rock), then either teleport
     //or move the player one step
     if(action === 'right' && this.x * horizontalDistance + playerHorizontalDisDelta + 100 < canvas.width - 100 && !player.isPositionProhibited(this.x + 1,this.y,allRocks)){
-        if(!player.teleported(this.x + 1,this.y, teleportPlatform1, teleportPlatform2))
+        if(!this.teleported(this.x + 1,this.y, teleportPlatform1, teleportPlatform2))
             this.x = this.x + 1;
     }
     else if(action === 'left' && this.x * horizontalDistance + playerHorizontalDisDelta - 100 > -100 && !player.isPositionProhibited(this.x - 1,this.y,allRocks)){
-        if(!player.teleported(this.x - 1,this.y, teleportPlatform1, teleportPlatform2))
+        if(!this.teleported(this.x - 1,this.y, teleportPlatform1, teleportPlatform2))
             this.x=this.x - 1;
     }
     else if(action === 'up' && this.y * verticalDistance + playerVerticalDisDelta - 100 > -100 && !player.isPositionProhibited(this.x,this.y - 1,allRocks)){
-        if(!player.teleported(this.x,this.y - 1, teleportPlatform1, teleportPlatform2))
+        if(!this.teleported(this.x,this.y - 1, teleportPlatform1, teleportPlatform2))
             this.y = this.y - 1;
     }
     else if(action === 'down' && this.y * verticalDistance + playerVerticalDisDelta + 100 < canvas.height - 100 && !player.isPositionProhibited(this.x,this.y + 1,allRocks)){
-        if(!player.teleported(this.x,this.y + 1, teleportPlatform1, teleportPlatform2))
+        if(!this.teleported(this.x,this.y + 1, teleportPlatform1, teleportPlatform2))
             this.y = this.y + 1;
     }
 };
@@ -195,16 +195,16 @@ Player.prototype.isPositionProhibited = function(nextX,nextY,allRocks){
 
 //Checking collisions of the player with other element except enemies
 Player.prototype.checkCollisions = function(allGems,heart,key){
-    if(player.x === allGems[0].x && player.y === allGems[0].y) {updateScore(score+10);allGems[0].visible=false;}
-    if(player.x === allGems[1].x && player.y === allGems[1].y) {updateScore(score+10);allGems[1].visible=false;}
-    if(player.x === allGems[2].x && player.y === allGems[2].y) {updateScore(score+20);allGems[2].visible=false;}
-    if(player.x === allGems[3].x && player.y === allGems[3].y) {updateScore(score+20);allGems[3].visible=false;}
-    if(player.x === allGems[4].x && player.y === allGems[4].y) {updateScore(score+30);allGems[4].visible=false;}
-    if(player.x === allGems[5].x && player.y === allGems[5].y) {updateScore(score+30);allGems[5].visible=false;}
+    if(this.x === allGems[0].x && this.y === allGems[0].y) {updateScore(score+10);allGems[0].visible=false;}
+    if(this.x === allGems[1].x && this.y === allGems[1].y) {updateScore(score+10);allGems[1].visible=false;}
+    if(this.x === allGems[2].x && this.y === allGems[2].y) {updateScore(score+20);allGems[2].visible=false;}
+    if(this.x === allGems[3].x && this.y === allGems[3].y) {updateScore(score+20);allGems[3].visible=false;}
+    if(this.x === allGems[4].x && this.y === allGems[4].y) {updateScore(score+30);allGems[4].visible=false;}
+    if(this.x === allGems[5].x && this.y === allGems[5].y) {updateScore(score+30);allGems[5].visible=false;}
 
-    if(player.x === heart.x && player.y === heart.y) {player.updateLives(1); heart.visible=false;}
+    if(this.x === heart.x && this.y === heart.y) {this.updateLives(1); heart.visible=false;}
 
-    if(player.x === key.x && player.y === key.y){
+    if(this.x === key.x && this.y === key.y){
         key.visible=false;
         alert("Congrats. You completed the game. Your score is "+score+".");
         resetGame();
